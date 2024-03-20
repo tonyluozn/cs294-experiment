@@ -70,3 +70,7 @@ if __name__ == "__main__":
     main(d=6, num_function=2**6, c_classes=2)
     main(d=8, num_function=2**8, c_classes=2)
 
+# d=2: n_full=4,           Avg. req. points for memorization n_avg=2.69,           n_full/n_avg=1.4883720930232558
+# d=4: n_full=16,           Avg. req. points for memorization n_avg=8.94,           n_full/n_avg=1.7902097902097902
+# d=6: n_full=64,           Avg. req. points for memorization n_avg=33.47,           n_full/n_avg=1.912231559290383
+# d=8: n_full=256,           Avg. req. points for memorization n_avg=172.17,           n_full/n_avg=1.4868862873218986
