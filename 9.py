@@ -5,6 +5,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
+import math
 
 # Data preparation
 transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
@@ -62,6 +63,12 @@ linear_layers_3 = [(7*7*8, 128),(128, 10)]
 conv_layers_4 = [(1, 2, 3, 1, 1),(2, 4, 3, 1, 1)]
 linear_layers_4 = [(7*7*4, 128),(128, 10)]
 
+# Model 5
+conv_layers_5 = [(1, 2, 3, 1, 1),(2, 1, 3, 1, 1)]
+linear_layers_5 = [(7*7*1, 128),(128, 10)]
+
+model_hyperparameters = [(conv_layers_1, linear_layers_1), (conv_layers_2, linear_layers_2), (conv_layers_3, linear_layers_3), (conv_layers_4, linear_layers_4)]
+
 
 # Compute MEC of the Decision Layer and arriving information in bits at the decision layer
 def compute_information_from_train_table(train_dataset):
@@ -83,15 +90,17 @@ def compute_G_total(linear_layer):
     flatten_size = linear_layer[0][0]
     return (28*28*1)/flatten_size
 
-MEC_decision_layer = compute_MEC_of_decision_layer(linear_layers_4)
-G_total = compute_G_total(linear_layers_4)
-total_information = compute_information_from_train_table(train_dataset)
-bits_information_arriving_at_decision_layer = total_information/G_total if G_total >= 1 else total_information
 
-print(f"MEC of the Decision Layer: {MEC_decision_layer}")
-print(f"total_information from train table: {total_information}")
-print(f"G_total: {G_total}")
-print(f"bits_information_arriving_at_decision_layer: {bits_information_arriving_at_decision_layer}")
+for i, model_config in enumerate(model_hyperparameters):
+    MEC_decision_layer = compute_MEC_of_decision_layer(model_config[0])
+    G_total = compute_G_total(model_config[1])
+    total_information = compute_information_from_train_table(train_dataset)
+    bits_information_arriving_at_decision_layer = total_information/G_total if G_total >= 1 else total_information
+    print(f"Model {i+1}")
+    print(f"MEC of the Decision Layer: {MEC_decision_layer}")
+    print(f"total_information from train table: {total_information}")
+    print(f"G_total: {G_total}")
+    print(f"bits_information_arriving_at_decision_layer: {bits_information_arriving_at_decision_layer}")
 
 
 # Train and evaluate the model
@@ -121,8 +130,8 @@ def evaluate_model(model, test_loader):
             correct += (predicted == labels).sum().item()
     print(f'Accuracy: {100 * correct / total}%')
 
-model_hyperparameters = [(conv_layers_1, linear_layers_1), (conv_layers_2, linear_layers_2), (conv_layers_3, linear_layers_3), (conv_layers_4, linear_layers_4)]
-for model_config in model_hyperparameters:
+for i, model_config in enumerate(model_hyperparameters):
+    print(f"Model {i+1}")
     model = CustomCNN(model_config[0], model_config[1], dropout_rate=0.5)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
