@@ -17,6 +17,17 @@ print(f"Number of features: {len(data.feature_names)}")
 print(f"Number of training instances: {len(X_train)}")
 print(f"Number of testing instances: {len(X_test)}")
 
+# Function to count the number of if-then clauses (non-leaf nodes)
+def count_if_then_clauses(tree):
+    n_nodes = tree.node_count
+    children_left = tree.children_left
+    children_right = tree.children_right
+    if_then_clauses = 0
+    for i in range(n_nodes):
+        if children_left[i] != -1 or children_right[i] != -1:
+            if_then_clauses += 1
+    return if_then_clauses
+
 
 clf = DecisionTreeClassifier(random_state=42)
 clf.fit(X_train, y_train)

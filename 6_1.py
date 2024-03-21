@@ -2,11 +2,6 @@ import numpy as np
 from sklearn import metrics
 from sklearn.neighbors import KNeighborsClassifier
 
-def generate_random_points(n_points, n_features):
-    # X = np.random.rand(n_points, n_features)
-    X = np.random.randint(0, 2, (n_points, n_features))
-    return X
-
 def generate_data(n_points, n_features):
     data = np.zeros((n_points, n_features))
     for i in range(n_points):
@@ -18,21 +13,7 @@ def generate_random_labels(n_points, c_classes):
     labels = np.random.choice(range(c_classes), n_points)
     return labels
 
-def generate_unique_random_labels(n_points, c_classes, n_labelings):
-    unique_labelings = set()
-    while len(unique_labelings) < n_labelings:
-        # Generate a random labeling
-        labels = tuple(np.random.choice(range(c_classes), n_points))
-        unique_labelings.add(labels)
-
-    # Convert each tuple back to a numpy array
-    unique_labelings = [np.array(labels) for labels in unique_labelings]
-    return unique_labelings
-
-def condensed_nearest_neighbor(X, y):
-    # Initialize S with one example from each class (optional)
-    # unique_labels = np.unique(y)
-    # S_indices = [np.where(y == label)[0][0] for label in unique_labels]
+def req_points_for_memorization(X, y):
     S_indices = [0]
     changed = True
     while changed:
@@ -54,10 +35,9 @@ def main(d, num_function, c_classes):
     n = 2**d
     avg_mem_size = 0
     X = generate_data(n, d)
-    # Y = generate_unique_random_labels(n, c_classes, num_function)
     for i in range(num_function):
         labels = generate_random_labels(n, c_classes)
-        req_points = condensed_nearest_neighbor(X, labels)
+        req_points = req_points_for_memorization(X, labels)
         avg_mem_size += req_points
     avg_mem_size /= num_function
     print(f"d={d}: n_full={2**d}, \
@@ -68,9 +48,7 @@ if __name__ == "__main__":
     main(d=2, num_function=16, c_classes=2)
     main(d=4, num_function=2**4, c_classes=2)
     main(d=6, num_function=2**6, c_classes=2)
-    main(d=8, num_function=2**8, c_classes=2)
 
 # d=2: n_full=4,           Avg. req. points for memorization n_avg=2.69,           n_full/n_avg=1.4883720930232558
 # d=4: n_full=16,           Avg. req. points for memorization n_avg=8.94,           n_full/n_avg=1.7902097902097902
 # d=6: n_full=64,           Avg. req. points for memorization n_avg=33.47,           n_full/n_avg=1.912231559290383
-# d=8: n_full=256,           Avg. req. points for memorization n_avg=172.17,           n_full/n_avg=1.4868862873218986
