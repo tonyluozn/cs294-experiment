@@ -5,6 +5,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
+import matplotlib.pyplot as plt
 import math
 
 # Data preparation
@@ -130,10 +131,26 @@ def evaluate_model(model, test_loader):
             correct += (predicted == labels).sum().item()
     print(f'Accuracy: {100 * correct / total}%')
 
+all_losses = []
 for i, model_config in enumerate(model_hyperparameters):
     print(f"Model {i+1}")
     model = CustomCNN(model_config[0], model_config[1], dropout_rate=0.5)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
-    train_model(model, train_loader, criterion, optimizer, num_epochs=10)
+    loss = train_model(model, train_loader, criterion, optimizer, num_epochs=10)
+    all_losses.append(loss)
     evaluate_model(model, test_loader)
+
+
+num_epochs = 10
+# Plotting the losses
+plt.figure(figsize=(10, 6)) 
+for i, losses in enumerate(all_losses):
+    epochs = list(range(1, num_epochs + 1))
+    plt.plot(epochs, losses, label=f'Model {i+1}')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.title('Training Loss of Different Models')
+plt.legend()
+plt.grid(True)
+plt.show()
