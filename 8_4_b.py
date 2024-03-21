@@ -1,11 +1,10 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 
+# Generate random labels with c equi-distributed classes
 def generate_random_points_and_labels(n_points, n_features, c_classes):
-    # Generate random points with n_features
     np.random.seed(2)
     X = np.random.rand(n_points, n_features)
-    # Generate random labels with c equi-distributed classes
     labels = np.random.choice(range(c_classes), n_points)
     return X, labels
 
@@ -21,26 +20,18 @@ def get_number_of_thresholds(data, labels):
     return thresholds
 
 def train_nearest_neighbors(X_train, y_train):
-    # Train a nearest neighbors classifier
-    clf = KNeighborsClassifier(n_neighbors=1)  # Using 1-NN for simplicity
+    clf = KNeighborsClassifier(n_neighbors=1) 
     clf.fit(X_train, y_train)
     return clf
 
 def get_number_of_instances_memorized(X_test, y_test, clf):
-    # Predict the labels for the test set
     y_pred = clf.predict(X_test)
-    # For 1-NN, we'll consider the number of correctly classified instances as memorized instances
     memorized_instances = np.sum(y_pred == y_test)
     return memorized_instances
 
 def main(n_points=10000, n_features=2, c_classes=3):
-    # Step 1: Generate random points and labels
     X, labels = generate_random_points_and_labels(n_points, n_features, c_classes)
-
-    # Step 2: Train the nearest neighbors classifier
     clf = train_nearest_neighbors(X, labels)
-
-    # Step 3: Information Capacity
     thresholds = get_number_of_thresholds(X, labels)
     memorized_instances = get_number_of_instances_memorized(X, labels, clf)
     info_capacity = memorized_instances / thresholds
