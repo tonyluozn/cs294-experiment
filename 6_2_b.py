@@ -42,24 +42,66 @@ print(f"----- Default Scikit-learn decision tree -----")
 print(f"Number of if-then clauses: {num_if_then_clauses}")
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
 
-
-
 # Strategy 1: Limit Tree Depth
-for depth in range(1, 5):
+depths = range(1, 10)
+accuracies_depth = []
+clauses_depth = []
+
+for depth in depths:
     clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     num_if_then_clauses = count_if_then_clauses(clf.tree_)
-    print(f"----- Decision tree with max_depth={depth} -----")
-    print(f"Number of if-then clauses: {num_if_then_clauses}")
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+    accuracies_depth.append(accuracy_score(y_test, y_pred))
+    clauses_depth.append(num_if_then_clauses)
+
+# Plot for Strategy 1
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.plot(depths, accuracies_depth, marker='o', linestyle='-', color='b', label='Accuracy')
+plt.xlabel('Max Depth')
+plt.ylabel('Accuracy')
+plt.title('Accuracy vs Max Depth')
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(depths, clauses_depth, marker='s', linestyle='-', color='r', label='If-Then Clauses')
+plt.xlabel('Max Depth')
+plt.ylabel('Number of If-Then Clauses')
+plt.title('If-Then Clauses vs Max Depth')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
 
 # Strategy 2: Limit Number of Leaf Nodes
-for max_leaf_nodes in range(2, 15):
+leaf_nodes = range(2, 20)
+accuracies_leaf = []
+clauses_leaf = []
+
+for max_leaf_nodes in leaf_nodes:
     clf = DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes, random_state=42)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     num_if_then_clauses = count_if_then_clauses(clf.tree_)
-    print(f"----- Decision tree with max_leaf_nodes={max_leaf_nodes} -----")
-    print(f"Number of if-then clauses: {num_if_then_clauses}")
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+    accuracies_leaf.append(accuracy_score(y_test, y_pred))
+    clauses_leaf.append(num_if_then_clauses)
+
+# Plot for Strategy 2
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.plot(leaf_nodes, accuracies_leaf, marker='o', linestyle='-', color='b', label='Accuracy')
+plt.xlabel('Max Leaf Nodes')
+plt.ylabel('Accuracy')
+plt.title('Accuracy vs Max Leaf Nodes')
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(leaf_nodes, clauses_leaf, marker='s', linestyle='-', color='r', label='If-Then Clauses')
+plt.xlabel('Max Leaf Nodes')
+plt.ylabel('Number of If-Then Clauses')
+plt.title('If-Then Clauses vs Max Leaf Nodes')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
