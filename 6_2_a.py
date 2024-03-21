@@ -11,17 +11,11 @@ data = load_breast_cancer()
 X = data.data
 y = data.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-print(f"Number of features: {len(data.feature_names)}")
-print(f"Number of training instances: {len(X_train)}")
-print(f"Number of testing instances: {len(X_test)}")
 
 # Train a decision tree classifier and evaluate its accuracy
 clf = DecisionTreeClassifier(random_state=42)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
-
-# Extract if-then rules
-rules = export_text(clf, feature_names=list(data.feature_names))
 
 # Function to count the number of if-then clauses (non-leaf nodes)
 def count_if_then_clauses(tree):
@@ -39,26 +33,69 @@ num_if_then_clauses = count_if_then_clauses(clf.tree_)
 print(f"----- Default Scikit-learn decision tree -----")
 print(f"Number of if-then clauses: {num_if_then_clauses}")
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
-# tree.plot_tree(clf, fontsize=2)
-# plt.show()
-
 
 # Strategy 1: Limit Tree Depth
-for depth in range(1, 5):
+depths = range(1, 10)
+accuracies_depth = []
+clauses_depth = []
+
+for depth in depths:
     clf = DecisionTreeClassifier(max_depth=depth, random_state=42)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     num_if_then_clauses = count_if_then_clauses(clf.tree_)
-    print(f"----- Decision tree with max_depth={depth} -----")
-    print(f"Number of if-then clauses: {num_if_then_clauses}")
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+    accuracies_depth.append(accuracy_score(y_test, y_pred))
+    clauses_depth.append(num_if_then_clauses)
 
 # Strategy 2: Limit Number of Leaf Nodes
-for max_leaf_nodes in range(2, 15):
+leaf_nodes = range(2, 20)
+accuracies_leaf = []
+clauses_leaf = []
+
+for max_leaf_nodes in leaf_nodes:
     clf = DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes, random_state=42)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
     num_if_then_clauses = count_if_then_clauses(clf.tree_)
-    print(f"----- Decision tree with max_leaf_nodes={max_leaf_nodes} -----")
-    print(f"Number of if-then clauses: {num_if_then_clauses}")
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.2f}")
+    accuracies_leaf.append(accuracy_score(y_test, y_pred))
+    clauses_leaf.append(num_if_then_clauses)
+
+
+# Plot for Strategy 1
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.plot(depths, accuracies_depth, marker='o', linestyle='-', color='b', label='Accuracy')
+plt.xlabel('Max Depth')
+plt.ylabel('Accuracy')
+plt.title('Accuracy vs Max Depth')
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(depths, clauses_depth, marker='s', linestyle='-', color='r', label='If-Then Clauses')
+plt.xlabel('Max Depth')
+plt.ylabel('Number of If-Then Clauses')
+plt.title('If-Then Clauses vs Max Depth')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+
+# Plot for Strategy 2
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.plot(leaf_nodes, accuracies_leaf, marker='o', linestyle='-', color='b', label='Accuracy')
+plt.xlabel('Max Leaf Nodes')
+plt.ylabel('Accuracy')
+plt.title('Accuracy vs Max Leaf Nodes')
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(leaf_nodes, clauses_leaf, marker='s', linestyle='-', color='r', label='If-Then Clauses')
+plt.xlabel('Max Leaf Nodes')
+plt.ylabel('Number of If-Then Clauses')
+plt.title('If-Then Clauses vs Max Leaf Nodes')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
