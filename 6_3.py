@@ -1,6 +1,7 @@
 import zlib
 import numpy as np
 import matplotlib.pyplot as plt
+import string
 
 def compress_string(input_string):
     """Compress a string and return the size of the compressed data."""
@@ -14,9 +15,9 @@ def generate_random_string(length, alphabet):
 # Define different levels of randomness by specifying alphabets
 alphabets = [
     'A',  # Least random: all characters are the same
-    'AB',  # Low randomness: two possible characters
+    'AB',
     'ABCDEFG',
-    string.ascii_letters,  # Moderate randomness: all letters
+    string.ascii_letters,
     string.printable,  # Higher randomness: letters, digits, punctuation
 ]
 
